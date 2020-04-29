@@ -1,0 +1,227 @@
+<!DOCTYPE html><html><head><style>html,body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: black;
+  color: white;
+}
+
+.cursor {
+  animation: Cursor 1.7s infinite linear;
+  display: inline-block;
+  width: 0.5rem;
+  height: 1rem;
+  background: white;
+}
+
+@keyframes Cursor {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+#root, #gal-bg {
+  height: 100%;
+}
+
+ul{
+  list-style-type: none;
+}
+ul li:hover {
+  background-color: white;
+  color: black;
+}</style><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<!-- for typescript target: AMD -->
+<script src="https://cdn.bootcss.com/require.js/2.3.6/require.min.js"></script>
+
+</head><body><div id="root"></div><script>;(function(){
+// 1. config requirejs
+// --- or import lib from url, like
+// --- import React from 'https://cdn.bootcss.com/react/16.13.1/umd/react.production.min.js'
+const oldLoad = requirejs.load
+requirejs.load = function (context, id, url) {
+  if (id === 'react') {
+    url = 'https://cdn.bootcss.com/react/16.13.1/umd/react.production.min.js'
+  }
+
+  if (id === 'react-dom') {
+    url = 'https://cdn.bootcss.com/react-dom/16.13.1/umd/react-dom.production.min.js'
+  }
+
+  return oldLoad.call(requirejs, context, id, url)
+}
+
+// 2. enjoy it!
+console.log('o(*≧▽≦)ツ┏━┓', new Date().toLocaleString())
+
+
+})();</script><script>var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define("index",["require", "exports", "react", "react-dom"], function (require, exports, react_1, react_dom_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    react_1 = __importStar(react_1);
+    react_dom_1 = __importDefault(react_dom_1);
+    var GAL_BG = 'gal-bg';
+    var Line = function (_a) {
+        var str = _a.str, _b = _a.speed, speed = _b === void 0 ? 100 : _b, _c = _a.onNext, onNext = _c === void 0 ? function () { } : _c, skip = _a.skip, _d = _a.wait, wait = _d === void 0 ? true : _d;
+        if (skip)
+            return react_1.default.createElement("span", null,
+                str,
+                react_1.default.createElement("br", null));
+        if (wait)
+            return react_1.default.createElement(react_1.default.Fragment, null);
+        var _e = __read(react_1.useState(0), 2), state = _e[0], setState = _e[1];
+        var ref = react_1.useRef(0);
+        var click = function () { return state < str.length ? setState(str.length) : onNext(); };
+        react_1.useEffect(function () {
+            if (state < str.length) {
+                ref.current = setTimeout(function () { return setState(state + 1); }, speed);
+            }
+            var container = document.getElementById(GAL_BG);
+            container.onclick = click;
+            return function () {
+                clearTimeout(ref.current);
+                container.onclick = null;
+            };
+        }, [state]);
+        return react_1.default.createElement(react_1.default.Fragment, null, str.slice(0, state));
+    };
+    var Lines = react_1.default.forwardRef(function (_a, ref) {
+        var lines = _a.lines, onNext = _a.onNext, _b = _a.init, init = _b === void 0 ? 0 : _b, speed = _a.speed;
+        var _c = __read(react_1.useState(init), 2), state = _c[0], setState = _c[1];
+        var nextStep = function () {
+            if (state < lines.length - 1) {
+                setState(state + 1);
+            }
+            else {
+                var hasNext = onNext();
+                hasNext && setState(0);
+            }
+        };
+        react_1.useImperativeHandle(ref, function () { return ({
+            getLine: function () { return state; }
+        }); });
+        return react_1.default.createElement("div", null,
+            lines.map(function (line, index) {
+                return react_1.default.createElement(Line, { key: line, skip: index < state, str: line, speed: speed, wait: state !== index, onNext: nextStep });
+            }),
+            react_1.default.createElement("span", { className: "cursor" }));
+    });
+    var Gal = react_1.default.forwardRef(function (_a, thisRef) {
+        var para = _a.para, end = _a.end, speed = _a.speed, _b = _a.initLine, initLine = _b === void 0 ? 0 : _b, _c = _a.initPage, initPage = _c === void 0 ? 0 : _c;
+        var _d = __read(react_1.useState(initPage), 2), state = _d[0], setState = _d[1];
+        var ref = react_1.useRef();
+        react_1.useImperativeHandle(thisRef, function () { return ({
+            getLine: function () { return ref.current.getLine(); },
+            getPage: function () { return state; }
+        }); });
+        return react_1.default.createElement("div", { id: GAL_BG, style: { userSelect: 'none' } },
+            react_1.default.createElement(Lines, { speed: speed, init: initLine, ref: ref, lines: para[state], onNext: function () {
+                    var hasNext = state < para.length - 1;
+                    if (hasNext) {
+                        setState(state + 1);
+                    }
+                    else {
+                        end && end();
+                    }
+                    return hasNext;
+                } }));
+    });
+    var Select = function (_a) {
+        var selects = _a.selects, onSelect = _a.onSelect;
+        return react_1.default.createElement("ul", { style: { userSelect: 'none' } }, Object.keys(selects).map(function (title) {
+            return react_1.default.createElement("li", { key: title, onClick: function () { return onSelect(selects[title]); } }, title);
+        }));
+    };
+    var Galgame = react_1.default.forwardRef(function (_a, thisRef) {
+        var paras = _a.paras, selects = _a.selects, end = _a.end, initLine = _a.initLine, initPage = _a.initPage, initPara = _a.initPara, speed = _a.speed;
+        var createSelect = function (page) { return react_1.default.createElement(Select, { selects: selects[page], onSelect: function (target) { return setDisplay(react_1.default.createElement(IndexPage, { page: target })); } }); };
+        var IndexPage = function (_a) {
+            var page = _a.page;
+            var ref = react_1.useRef();
+            react_1.useImperativeHandle(thisRef, function () { return ({
+                getLine: function () { return ref.current.getLine(); },
+                getPage: function () { return ref.current.getPage(); },
+                getPara: function () { return page; }
+            }); });
+            return react_1.default.createElement(Gal, { speed: speed, initLine: initLine, initPage: initPage, ref: ref, para: paras[page], end: function () {
+                    if (page in selects) {
+                        setDisplay(createSelect(page));
+                    }
+                    else {
+                        end && end();
+                    }
+                } });
+        };
+        var currentPage = react_1.default.createElement(IndexPage, { page: initPara || Object.keys(paras)[0] });
+        var _b = __read(react_1.useState(currentPage), 2), display = _b[0], setDisplay = _b[1];
+        return display;
+    });
+    var KEYS = {
+        GAL_PARA: 'GAL_PARA',
+        GAL_PAGE: 'GAL_PAGE',
+        GAL_LINE: 'GAL_LINE',
+        GAL_SPEED: 'GAL_SPEED'
+    };
+    var App = function (_a) {
+        var _b = _a.data, paras = _b.paras, selects = _b.selects;
+        var ref = react_1.useRef();
+        return react_1.default.createElement(react_1.default.Fragment, null,
+            react_1.default.createElement("nav", null,
+                react_1.default.createElement("button", { onClick: function () {
+                        var Para = ref.current.getPara();
+                        var Page = ref.current.getPage();
+                        var Line = ref.current.getLine();
+                        localStorage.setItem(KEYS.GAL_PARA, Para);
+                        localStorage.setItem(KEYS.GAL_PAGE, String(Page));
+                        localStorage.setItem(KEYS.GAL_LINE, String(Line));
+                    } }, "save"),
+                react_1.default.createElement("button", { onClick: function () {
+                        localStorage.removeItem(KEYS.GAL_PARA);
+                        localStorage.removeItem(KEYS.GAL_PAGE);
+                        localStorage.removeItem(KEYS.GAL_LINE);
+                    } }, "clear")),
+            react_1.default.createElement("hr", null),
+            react_1.default.createElement(Galgame, { initPara: localStorage.getItem(KEYS.GAL_PARA), initPage: Number(localStorage.getItem(KEYS.GAL_PAGE)), initLine: Number(localStorage.getItem(KEYS.GAL_LINE)), ref: ref, paras: paras, selects: selects, end: function () { return console.log('end'); } }));
+    };
+    fetch('/galgame/data.json').then(function (res) { return res.json(); }).then(function (data) {
+        return react_dom_1.default.render(react_1.default.createElement(App, { data: data }), document.getElementById('root'));
+    });
+});
+;require(["index"])</script></body></html>
