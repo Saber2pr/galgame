@@ -51,9 +51,7 @@ ul li:hover {
 <!-- for typescript target: AMD -->
 <script src="https://cdn.bootcss.com/require.js/2.3.6/require.min.js"></script>
 
-</head><body><div id="root"></div>
-
-<script>;(function(){
+</head><body><div id="root"></div><script>;(function(){
 // 1. config requirejs
 // --- or import lib from url, like
 // --- import React from 'https://cdn.bootcss.com/react/16.13.1/umd/react.production.min.js'
@@ -67,12 +65,15 @@ requirejs.load = function (context, id, url) {
     url = 'https://cdn.bootcss.com/react-dom/16.13.1/umd/react-dom.production.min.js'
   }
 
+  if (id === 'axios') {
+    url = 'https://cdn.bootcss.com/axios/0.19.2/axios.min.js'
+  }
+
   return oldLoad.call(requirejs, context, id, url)
 }
 
 // 2. enjoy it!
 console.log('o(*≧▽≦)ツ┏━┓', new Date().toLocaleString())
-
 
 })();</script><script>var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -165,22 +166,27 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
                 backgroundRepeat: "no-repeat"
             } });
     };
-    var Music = react_1.default.memo(function (_a) {
+    var Music = react_1.default.forwardRef(function (_a, thisRef) {
         var src = _a.src;
-        return react_1.default.createElement("audio", { ref: function (el) { return el.play(); }, autoPlay: true, src: src });
+        return react_1.default.createElement("audio", { ref: thisRef, autoPlay: true, src: src });
     });
     var Gal = react_1.default.forwardRef(function (_a, thisRef) {
         var pages = _a.pages, end = _a.end, speed = _a.speed, _b = _a.initLine, initLine = _b === void 0 ? 0 : _b, _c = _a.initPage, initPage = _c === void 0 ? 0 : _c;
         var _d = __read(react_1.useState(initPage), 2), state = _d[0], setState = _d[1];
         var _e = pages[state], lines = _e.lines, bg = _e.bg, music = _e.music;
         var ref = react_1.useRef();
+        var music_ref = react_1.useRef();
         react_1.useImperativeHandle(thisRef, function () { return ({
             getLine: function () { return ref.current.getLine(); },
             getPage: function () { return state; }
         }); });
-        return react_1.default.createElement("div", { id: GAL_BG, style: { userSelect: 'none', } },
+        return react_1.default.createElement("div", { id: GAL_BG, style: { userSelect: 'none', }, onClick: function () {
+                if (music_ref.current.currentTime === 0) {
+                    music_ref.current.play();
+                }
+            } },
             bg && react_1.default.createElement(Picture, { src: bg }),
-            music && react_1.default.createElement(Music, { src: music }),
+            music && react_1.default.createElement(Music, { ref: music_ref, src: music }),
             react_1.default.createElement(Lines, { speed: speed, init: initLine, ref: ref, lines: lines, onNext: function () {
                     var hasNext = state < pages.length - 1;
                     if (hasNext) {
