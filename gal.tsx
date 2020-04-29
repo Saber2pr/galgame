@@ -58,7 +58,7 @@ const Lines = React.forwardRef<LinesRef, Lines>
     useImperativeHandle(ref, () => ({
       getLine: () => state
     }))
-    return <div>
+    return <div style={{ padding: '0.5rem' }}>
       {lines.map((line, index) =>
         <Line
           key={line}
@@ -71,10 +71,13 @@ const Lines = React.forwardRef<LinesRef, Lines>
     </div>
   })
 
-type Para = string[][]
+type Page = {
+  lines: string[],
+  bg: string
+}
 
 interface Gal {
-  para: Para
+  pages: Page[]
   end?: Function
   initPage?: number
   initLine?: number
@@ -85,21 +88,36 @@ interface GalRef extends LinesRef {
   getPage: () => number
 }
 
-const Gal = React.forwardRef<GalRef, Gal>(({ para, end, speed, initLine = 0, initPage = 0 }, thisRef) => {
+const Picture = ({ src }: { src: string }) =>
+  <picture style={{
+    backgroundImage: `url(${src})`,
+    opacity: 0.5,
+    width: '100%',
+    height: '100%',
+    position: "absolute",
+    zIndex: -1,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat"
+  }} />
+
+const Gal = React.forwardRef<GalRef, Gal>(({ pages, end, speed, initLine = 0, initPage = 0 }, thisRef) => {
   const [state, setState] = useState(initPage)
+  const { lines, bg } = pages[state]
   const ref = useRef<LinesRef>()
   useImperativeHandle(thisRef, () => ({
     getLine: () => ref.current.getLine(),
     getPage: () => state
   }))
-  return <div id={GAL_BG} style={{ userSelect: 'none' }}>
+  return <div id={GAL_BG} style={{ userSelect: 'none', }}>
+    <Picture src={bg} />
     <Lines
       speed={speed}
       init={initLine}
       ref={ref}
-      lines={para[state]}
+      lines={lines}
       onNext={() => {
-        const hasNext = state < para.length - 1
+        const hasNext = state < pages.length - 1
         if (hasNext) {
           setState(state + 1)
         } else {
@@ -111,7 +129,7 @@ const Gal = React.forwardRef<GalRef, Gal>(({ para, end, speed, initLine = 0, ini
 })
 
 type Paras = {
-  [page: string]: Para
+  [page: string]: Page[]
 }
 
 type Selects = {
@@ -162,7 +180,7 @@ const Galgame = React.forwardRef<GalgameRef, Galgame>(
         initLine={initLine}
         initPage={initPage}
         ref={ref}
-        para={paras[page]}
+        pages={paras[page]}
         end={() => {
           if (page in selects) {
             setDisplay(createSelect(page))
@@ -195,7 +213,7 @@ interface App {
 const App = ({ data: { paras, selects } }: App) => {
   const ref = useRef<GalgameRef>()
   return <>
-    <nav>
+    <nav style={{ position: 'absolute', bottom: '0.5rem', right: '0.5rem' }}>
       <button
         onClick={() => {
           const Para = ref.current.getPara()
@@ -212,7 +230,6 @@ const App = ({ data: { paras, selects } }: App) => {
           localStorage.removeItem(KEYS.GAL_LINE)
         }}>clear</button>
     </nav>
-    <hr />
     <Galgame
       initPara={localStorage.getItem(KEYS.GAL_PARA)}
       initPage={Number(localStorage.getItem(KEYS.GAL_PAGE))}
@@ -220,7 +237,7 @@ const App = ({ data: { paras, selects } }: App) => {
       ref={ref}
       paras={paras}
       selects={selects}
-      end={() => console.log('end')}
+      end={() => alert('end')}
     />
 
   </>
