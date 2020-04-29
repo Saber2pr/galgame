@@ -72,8 +72,9 @@ const Lines = React.forwardRef<LinesRef, Lines>
   })
 
 type Page = {
-  lines: string[],
+  lines: string[]
   bg: string
+  music: string
 }
 
 interface Gal {
@@ -101,16 +102,19 @@ const Picture = ({ src }: { src: string }) =>
     backgroundRepeat: "no-repeat"
   }} />
 
+const Music = React.memo(({ src }: { src: string }) => <audio autoPlay={true} src={src} />)
+
 const Gal = React.forwardRef<GalRef, Gal>(({ pages, end, speed, initLine = 0, initPage = 0 }, thisRef) => {
   const [state, setState] = useState(initPage)
-  const { lines, bg } = pages[state]
+  const { lines, bg, music } = pages[state]
   const ref = useRef<LinesRef>()
   useImperativeHandle(thisRef, () => ({
     getLine: () => ref.current.getLine(),
     getPage: () => state
   }))
   return <div id={GAL_BG} style={{ userSelect: 'none', }}>
-    <Picture src={bg} />
+    {bg && <Picture src={bg} />}
+    {music && <Music src={music} />}
     <Lines
       speed={speed}
       init={initLine}
@@ -212,23 +216,23 @@ interface App {
 
 const App = ({ data: { paras, selects } }: App) => {
   const ref = useRef<GalgameRef>()
+  const save = () => {
+    const Para = ref.current.getPara()
+    const Page = ref.current.getPage()
+    const Line = ref.current.getLine()
+    localStorage.setItem(KEYS.GAL_PARA, Para)
+    localStorage.setItem(KEYS.GAL_PAGE, String(Page))
+    localStorage.setItem(KEYS.GAL_LINE, String(Line))
+  }
+  const clear = () => {
+    localStorage.removeItem(KEYS.GAL_PARA)
+    localStorage.removeItem(KEYS.GAL_PAGE)
+    localStorage.removeItem(KEYS.GAL_LINE)
+  }
   return <>
     <nav style={{ position: 'absolute', bottom: '0.5rem', right: '0.5rem' }}>
-      <button
-        onClick={() => {
-          const Para = ref.current.getPara()
-          const Page = ref.current.getPage()
-          const Line = ref.current.getLine()
-          localStorage.setItem(KEYS.GAL_PARA, Para)
-          localStorage.setItem(KEYS.GAL_PAGE, String(Page))
-          localStorage.setItem(KEYS.GAL_LINE, String(Line))
-        }}>save</button>
-      <button
-        onClick={() => {
-          localStorage.removeItem(KEYS.GAL_PARA)
-          localStorage.removeItem(KEYS.GAL_PAGE)
-          localStorage.removeItem(KEYS.GAL_LINE)
-        }}>clear</button>
+      <button onClick={save}>save</button>
+      <button onClick={clear}>clear</button>
     </nav>
     <Galgame
       initPara={localStorage.getItem(KEYS.GAL_PARA)}
@@ -237,9 +241,12 @@ const App = ({ data: { paras, selects } }: App) => {
       ref={ref}
       paras={paras}
       selects={selects}
-      end={() => alert('end')}
+      end={() => {
+        if (confirm('需要重新开始吗？')) {
+          location.reload()
+        }
+      }}
     />
-
   </>
 }
 
