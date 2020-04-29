@@ -249,6 +249,7 @@ const App = ({ data: { paras, selects } }: App) => {
       selects={selects}
       end={() => {
         if (confirm('需要重新开始吗？')) {
+          clear()
           location.reload()
         }
       }}
