@@ -102,19 +102,25 @@ const Picture = ({ src }: { src: string }) =>
     backgroundRepeat: "no-repeat"
   }} />
 
-const Music = React.memo(({ src }: { src: string }) => <audio autoPlay={true} src={src} />)
+const Music = React.forwardRef<HTMLAudioElement, { src: string }>(({ src }, thisRef) =>
+  <audio ref={thisRef} autoPlay={true} src={src} />)
 
 const Gal = React.forwardRef<GalRef, Gal>(({ pages, end, speed, initLine = 0, initPage = 0 }, thisRef) => {
   const [state, setState] = useState(initPage)
   const { lines, bg, music } = pages[state]
   const ref = useRef<LinesRef>()
+  const music_ref = useRef<HTMLAudioElement>()
   useImperativeHandle(thisRef, () => ({
     getLine: () => ref.current.getLine(),
     getPage: () => state
   }))
-  return <div id={GAL_BG} style={{ userSelect: 'none', }}>
+  return <div id={GAL_BG} style={{ userSelect: 'none', }} onClick={() => {
+    if (music_ref.current.currentTime === 0) {
+      music_ref.current.play()
+    }
+  }}>
     {bg && <Picture src={bg} />}
-    {music && <Music src={music} />}
+    {music && <Music ref={music_ref} src={music} />}
     <Lines
       speed={speed}
       init={initLine}
