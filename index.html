@@ -45,7 +45,9 @@ ul li:hover {
 <!-- for typescript target: AMD -->
 <script src="https://cdn.bootcss.com/require.js/2.3.6/require.min.js"></script>
 
-</head><body><div id="root"></div><script>;(function(){
+</head><body><div id="root"></div>
+
+<script>;(function(){
 // 1. config requirejs
 // --- or import lib from url, like
 // --- import React from 'https://cdn.bootcss.com/react/16.13.1/umd/react.production.min.js'
@@ -218,7 +220,7 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
                         localStorage.removeItem(KEYS.GAL_LINE);
                     } }, "clear")),
             react_1.default.createElement("hr", null),
-            react_1.default.createElement(Galgame, { initPara: localStorage.getItem(KEYS.GAL_PARA), initPage: Number(localStorage.getItem(KEYS.GAL_PAGE)), initLine: Number(localStorage.getItem(KEYS.GAL_LINE)), ref: ref, paras: paras, selects: selects, end: function () { return console.log('end'); } }));
+            react_1.default.createElement(Galgame, { initPara: localStorage.getItem(KEYS.GAL_PARA), initPage: Number(localStorage.getItem(KEYS.GAL_PAGE)), initLine: Number(localStorage.getItem(KEYS.GAL_LINE)), ref: ref, paras: paras, selects: selects, end: function () { return alert('end'); } }));
     };
     fetch('/galgame/data.json').then(function (res) { return res.json(); }).then(function (data) {
         return react_dom_1.default.render(react_1.default.createElement(App, { data: data }), document.getElementById('root'));
