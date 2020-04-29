@@ -256,6 +256,7 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
                 react_1.default.createElement("button", { onClick: clear }, "clear")),
             react_1.default.createElement(Galgame, { initPara: localStorage.getItem(KEYS.GAL_PARA), initPage: Number(localStorage.getItem(KEYS.GAL_PAGE)), initLine: Number(localStorage.getItem(KEYS.GAL_LINE)), ref: ref, paras: paras, selects: selects, end: function () {
                     if (confirm('需要重新开始吗？')) {
+                        clear();
                         location.reload();
                     }
                 } }));
