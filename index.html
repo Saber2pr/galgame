@@ -167,7 +167,7 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
     };
     var Music = react_1.default.memo(function (_a) {
         var src = _a.src;
-        return react_1.default.createElement("audio", { autoPlay: true, src: src });
+        return react_1.default.createElement("audio", { ref: function (el) { return el.play(); }, autoPlay: true, src: src });
     });
     var Gal = react_1.default.forwardRef(function (_a, thisRef) {
         var pages = _a.pages, end = _a.end, speed = _a.speed, _b = _a.initLine, initLine = _b === void 0 ? 0 : _b, _c = _a.initPage, initPage = _c === void 0 ? 0 : _c;
