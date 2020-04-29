@@ -1,10 +1,16 @@
-<!DOCTYPE html><html><head><style>html,body {
+<!DOCTYPE html><html><head><style>html {
+  overflow: hidden;
+}
+
+html,body {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  background: black;
+  background-color: black;
   color: white;
 }
 
@@ -139,23 +145,39 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
         react_1.useImperativeHandle(ref, function () { return ({
             getLine: function () { return state; }
         }); });
-        return react_1.default.createElement("div", null,
+        return react_1.default.createElement("div", { style: { padding: '0.5rem' } },
             lines.map(function (line, index) {
                 return react_1.default.createElement(Line, { key: line, skip: index < state, str: line, speed: speed, wait: state !== index, onNext: nextStep });
             }),
             react_1.default.createElement("span", { className: "cursor" }));
     });
+    var Picture = function (_a) {
+        var src = _a.src;
+        return react_1.default.createElement("picture", { style: {
+                backgroundImage: "url(" + src + ")",
+                opacity: 0.5,
+                width: '100%',
+                height: '100%',
+                position: "absolute",
+                zIndex: -1,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+            } });
+    };
     var Gal = react_1.default.forwardRef(function (_a, thisRef) {
-        var para = _a.para, end = _a.end, speed = _a.speed, _b = _a.initLine, initLine = _b === void 0 ? 0 : _b, _c = _a.initPage, initPage = _c === void 0 ? 0 : _c;
+        var pages = _a.pages, end = _a.end, speed = _a.speed, _b = _a.initLine, initLine = _b === void 0 ? 0 : _b, _c = _a.initPage, initPage = _c === void 0 ? 0 : _c;
         var _d = __read(react_1.useState(initPage), 2), state = _d[0], setState = _d[1];
+        var _e = pages[state], lines = _e.lines, bg = _e.bg;
         var ref = react_1.useRef();
         react_1.useImperativeHandle(thisRef, function () { return ({
             getLine: function () { return ref.current.getLine(); },
             getPage: function () { return state; }
         }); });
-        return react_1.default.createElement("div", { id: GAL_BG, style: { userSelect: 'none' } },
-            react_1.default.createElement(Lines, { speed: speed, init: initLine, ref: ref, lines: para[state], onNext: function () {
-                    var hasNext = state < para.length - 1;
+        return react_1.default.createElement("div", { id: GAL_BG, style: { userSelect: 'none', } },
+            react_1.default.createElement(Picture, { src: bg }),
+            react_1.default.createElement(Lines, { speed: speed, init: initLine, ref: ref, lines: lines, onNext: function () {
+                    var hasNext = state < pages.length - 1;
                     if (hasNext) {
                         setState(state + 1);
                     }
@@ -182,7 +204,7 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
                 getPage: function () { return ref.current.getPage(); },
                 getPara: function () { return page; }
             }); });
-            return react_1.default.createElement(Gal, { speed: speed, initLine: initLine, initPage: initPage, ref: ref, para: paras[page], end: function () {
+            return react_1.default.createElement(Gal, { speed: speed, initLine: initLine, initPage: initPage, ref: ref, pages: paras[page], end: function () {
                     if (page in selects) {
                         setDisplay(createSelect(page));
                     }
@@ -205,7 +227,7 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
         var _b = _a.data, paras = _b.paras, selects = _b.selects;
         var ref = react_1.useRef();
         return react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement("nav", null,
+            react_1.default.createElement("nav", { style: { position: 'absolute', bottom: '0.5rem', right: '0.5rem' } },
                 react_1.default.createElement("button", { onClick: function () {
                         var Para = ref.current.getPara();
                         var Page = ref.current.getPage();
@@ -219,7 +241,6 @@ define("index",["require", "exports", "react", "react-dom"], function (require, 
                         localStorage.removeItem(KEYS.GAL_PAGE);
                         localStorage.removeItem(KEYS.GAL_LINE);
                     } }, "clear")),
-            react_1.default.createElement("hr", null),
             react_1.default.createElement(Galgame, { initPara: localStorage.getItem(KEYS.GAL_PARA), initPage: Number(localStorage.getItem(KEYS.GAL_PAGE)), initLine: Number(localStorage.getItem(KEYS.GAL_LINE)), ref: ref, paras: paras, selects: selects, end: function () { return alert('end'); } }));
     };
     fetch('/galgame/data.json').then(function (res) { return res.json(); }).then(function (data) {
